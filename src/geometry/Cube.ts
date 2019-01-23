@@ -46,31 +46,37 @@ class Cube extends Drawable {
             0, -1, 0, 0,
             0, -1, 0, 0,
             0, -1, 0, 0]);
+        var x = this.center[0] + 1;
+        var y = this.center[1] + 1;
+        var z = this.center[2] + 1;
+        var xinv = this.center[0] - 1;
+        var yinv = this.center[1] - 1;
+        var zinv = this.center[2] - 1;
         this.positions = new Float32Array([
-            -1, -1, 1, 1,
-            1, -1, 1, 1,
-            1, 1, 1, 1,
-            -1, 1, 1, 1, //front
-            1, 1, 1, 1,
-            1, 1, -1, 1,
-            1, -1, -1, 1,
-            1, -1, 1, 1, //right
-            -1, -1, -1, 1,
-            1, -1, -1, 1,
-            1, 1, -1, 1,
-            -1, 1, -1, 1, //back
-            -1, -1, 1, 1,
-            -1, -1, -1, 1,
-            -1, 1, -1, 1,
-            -1, 1, 1, 1, //left
-            1, 1, 1, 1,
-            -1, 1, 1, 1,
-            -1, 1, -1, 1,
-            1, 1, -1, 1, //upper
-            -1, -1, -1, 1,
-            1, -1, -1, 1,
-            1, -1, 1, 1,
-            -1, -1, 1, 1]);
+            xinv, yinv, z, 1,
+            x, yinv, z, 1,
+            x, y, z, 1,
+            xinv, y, z, 1, //front
+            x, y, z, 1,
+            x, y, zinv, 1,
+            x, yinv, zinv, 1,
+            x, yinv, z, 1, //right
+            xinv, yinv, zinv, 1,
+            x, yinv, zinv, 1,
+            x, y, zinv, 1,
+            xinv, y, zinv, 1, //back
+            xinv, yinv, z, 1,
+            xinv, yinv, zinv, 1,
+            xinv, y, zinv, 1,
+            xinv, y, z, 1, //left
+            x, y, z, 1,
+            xinv, z, z, 1,
+            xinv, z, zinv, 1,
+            x, y, zinv, 1, //upper
+            xinv, yinv, zinv, 1,
+            x, yinv, zinv, 1,
+            x, yinv, z, 1,
+            xinv, zinv, 1, 1]);
 
         this.generateIdx();
         this.generatePos();
