@@ -14,12 +14,14 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
+  'Color': [255, 0, 0]
 };
 
 let icosphere: Icosphere;
 let cube: Cube;
 let square: Square;
 let prevTesselations: number = 5;
+let prevColor = [255, 0, 0]
 
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
@@ -43,6 +45,7 @@ function main() {
   const gui = new DAT.GUI();
   gui.add(controls, 'tesselations', 0, 8).step(1);
   gui.add(controls, 'Load Scene');
+  gui.addColor(controls, 'Color');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -68,6 +71,9 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
 
+  var r = 1;
+  var g = 0;
+  var b = 0;
   // This function will be called every frame
   function tick() {
     camera.update();
@@ -80,11 +86,21 @@ function main() {
       icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, prevTesselations);
       icosphere.create();
     }
+
+    if(controls.Color != prevColor && Array.isArray(controls.Color))
+    {
+      prevColor = controls.Color;
+      r = prevColor[0] / 255.0;
+      g = prevColor[1] / 255.0;
+      b = prevColor[2] / 255.0;
+      console.log(r, g, b);
+    }
+
     renderer.render(camera, lambert, [
       icosphere,
       cube,
       //square,
-    ]);
+    ], r, g , b);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
