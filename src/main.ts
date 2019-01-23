@@ -14,14 +14,16 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
-  'Color': [255, 0, 0]
+  'Color': [255, 0, 0],
+  'Shaders': 'Lambert'
 };
 
 let icosphere: Icosphere;
 let cube: Cube;
 let square: Square;
 let prevTesselations: number = 5;
-let prevColor = [255, 0, 0]
+let prevColor = [255, 0, 0];
+let prevShader = 'Lambert';
 
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
@@ -46,6 +48,7 @@ function main() {
   gui.add(controls, 'tesselations', 0, 8).step(1);
   gui.add(controls, 'Load Scene');
   gui.addColor(controls, 'Color');
+  gui.add(controls, 'Shaders', ['Lambert', 'Custom']);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -71,9 +74,16 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
 
-  var r = 1;
-  var g = 0;
-  var b = 0;
+  const custom = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
+  ]);
+
+  let r = 1;
+  let g = 0;
+  let b = 0;
+  let shader = lambert;
+
   // This function will be called every frame
   function tick() {
     camera.update();
@@ -93,10 +103,20 @@ function main() {
       r = prevColor[0] / 255.0;
       g = prevColor[1] / 255.0;
       b = prevColor[2] / 255.0;
-      console.log(r, g, b);
     }
 
-    renderer.render(camera, lambert, [
+    if(controls.Shaders != prevShader)
+    {
+      prevShader = controls.Shaders;
+      console.log(prevShader);
+      if (prevShader === 'Lambert') {
+        shader = lambert;
+      } else {
+        shader = custom;
+      }
+    }
+
+    renderer.render(camera, shader, [
       icosphere,
       cube,
       //square,
