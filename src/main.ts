@@ -14,16 +14,22 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
-  'Color': [255, 0, 0, 1],
-  'Shaders': 'Lambert'
+  //'Color': [255, 0, 0, 1],
+  'Shaders': 'Lambert',
+  'R': 255,
+  'G': 0,
+  'B':0
 };
 
 let icosphere: Icosphere;
 let cube: Cube;
 let square: Square;
 let prevTesselations: number = 5;
-let prevColor = [255, 0, 0, 1];
+//let prevColor = [255, 0, 0, 1];
 let prevShader = 'Lambert';
+let prevR = 255.0;
+let prevG = 0.0;
+let prevB = 0.0;
 
 
 
@@ -49,8 +55,14 @@ function main() {
   const gui = new DAT.GUI();
   gui.add(controls, 'tesselations', 0, 8).step(1);
   gui.add(controls, 'Load Scene');
-  gui.addColor(controls, 'Color');
+  //gui.addColor(controls, 'Color');
   gui.add(controls, 'Shaders', ['Lambert', 'Custom']);
+  var colorFolder = gui.addFolder('Change Color');
+  colorFolder.add(controls, "R", 0, 255).step(1);
+  colorFolder.add(controls, "G", 0, 255).step(1);
+  colorFolder.add(controls, "B", 0, 255).step(1);
+
+
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -112,24 +124,39 @@ function main() {
       }
     }
 
-    if(controls.Color != prevColor)
-    {
-      if (Array.isArray(controls.Color)) {
-        prevColor = controls.Color;
-        r = prevColor[0] / 255.0;
-        g = prevColor[1] / 255.0;
-        b = prevColor[2] / 255.0;
-      } else {
-        // convert to RGB from hex
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(controls.Color);
-        return result ? {
-          r: parseInt(result[1], 16) / 255.0,
-          g: parseInt(result[2], 16) / 255.0,
-          b: parseInt(result[3], 16) / 255.0
-        } : null;
-      }
-      console.log(r, g, b);
+    if(controls.R != prevR) {
+      prevR = controls.R;
+      r = prevR / 255.0;
     }
+
+    if(controls.G != prevG) {
+      prevG = controls.G;
+      g = prevG / 255.0;
+    }
+
+    if(controls.B != prevB) {
+      prevB = controls.B;
+      b = prevB / 255.0;
+    }
+
+    // if(controls.Color != prevColor)
+    // {
+    //   if (Array.isArray(controls.Color)) {
+    //     prevColor = controls.Color;
+    //     r = prevColor[0] / 255.0;
+    //     g = prevColor[1] / 255.0;
+    //     b = prevColor[2] / 255.0;
+    //   } else {
+    //     // convert to RGB from hex
+    //     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(controls.Color);
+    //     return result ? {
+    //       r: parseInt(result[1], 16) / 255.0,
+    //       g: parseInt(result[2], 16) / 255.0,
+    //       b: parseInt(result[3], 16) / 255.0
+    //     } : null;
+    //   }
+    //   console.log(r, g, b);
+    // }
 
 
     renderer.render(camera, shader, [
