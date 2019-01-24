@@ -79,7 +79,6 @@ class ShaderProgram {
     if (this.unifTime !== -1)
     {
       gl.uniform1f(this.unifTime, t);
-      console.log(t);
     }
   }
 
