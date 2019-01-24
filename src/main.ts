@@ -14,7 +14,7 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
-  'Color': [255, 0, 0],
+  'Color': [255, 0, 0, 1],
   'Shaders': 'Lambert'
 };
 
@@ -22,7 +22,7 @@ let icosphere: Icosphere;
 let cube: Cube;
 let square: Square;
 let prevTesselations: number = 5;
-let prevColor = [255, 0, 0];
+let prevColor = [255, 0, 0, 1];
 let prevShader = 'Lambert';
 
 function loadScene() {
@@ -97,24 +97,36 @@ function main() {
       icosphere.create();
     }
 
-    if(controls.Color != prevColor && Array.isArray(controls.Color))
-    {
-      prevColor = controls.Color;
-      r = prevColor[0] / 255.0;
-      g = prevColor[1] / 255.0;
-      b = prevColor[2] / 255.0;
-    }
-
     if(controls.Shaders != prevShader)
     {
       prevShader = controls.Shaders;
       console.log(prevShader);
-      if (prevShader === 'Lambert') {
+      if (prevShader == 'Lambert') {
         shader = lambert;
       } else {
         shader = custom;
       }
     }
+
+    if(controls.Color != prevColor)
+    {
+      if (Array.isArray(controls.Color)) {
+        prevColor = controls.Color;
+        r = prevColor[0] / 255.0;
+        g = prevColor[1] / 255.0;
+        b = prevColor[2] / 255.0;
+      } else {
+        // convert to RGB from hex
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(controls.Color);
+        return result ? {
+          r: parseInt(result[1], 16) / 255.0,
+          g: parseInt(result[2], 16) / 255.0,
+          b: parseInt(result[3], 16) / 255.0
+        } : null;
+      }
+      console.log(r, g, b);
+    }
+
 
     renderer.render(camera, shader, [
       icosphere,
