@@ -14,14 +14,18 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
-  'Color': [255, 0, 0]
+  'Color': [255, 0, 0, 1],
+  'Shaders': 'Lambert'
 };
 
 let icosphere: Icosphere;
 let cube: Cube;
 let square: Square;
 let prevTesselations: number = 5;
-let prevColor = [255, 0, 0]
+let prevColor = [255, 0, 0, 1];
+let prevShader = 'Lambert';
+
+
 
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
@@ -46,6 +50,7 @@ function main() {
   gui.add(controls, 'tesselations', 0, 8).step(1);
   gui.add(controls, 'Load Scene');
   gui.addColor(controls, 'Color');
+  gui.add(controls, 'Shaders', ['Lambert', 'Custom']);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -71,11 +76,20 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
 
-  var r = 1;
-  var g = 0;
-  var b = 0;
+  const custom = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/custom-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/custom-frag.glsl')),
+  ]);
+
+  let r = 1;
+  let g = 0;
+  let b = 0;
+  let t = 0.0;
+  let shader = lambert;
+
   // This function will be called every frame
   function tick() {
+    t = t + 1.0;
     camera.update();
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
@@ -87,20 +101,42 @@ function main() {
       icosphere.create();
     }
 
-    if(controls.Color != prevColor && Array.isArray(controls.Color))
+    if(controls.Shaders != prevShader)
     {
-      prevColor = controls.Color;
-      r = prevColor[0] / 255.0;
-      g = prevColor[1] / 255.0;
-      b = prevColor[2] / 255.0;
+      prevShader = controls.Shaders;
+      console.log(prevShader);
+      if (prevShader == 'Lambert') {
+        shader = lambert;
+      } else {
+        shader = custom;
+      }
+    }
+
+    if(controls.Color != prevColor)
+    {
+      if (Array.isArray(controls.Color)) {
+        prevColor = controls.Color;
+        r = prevColor[0] / 255.0;
+        g = prevColor[1] / 255.0;
+        b = prevColor[2] / 255.0;
+      } else {
+        // convert to RGB from hex
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(controls.Color);
+        return result ? {
+          r: parseInt(result[1], 16) / 255.0,
+          g: parseInt(result[2], 16) / 255.0,
+          b: parseInt(result[3], 16) / 255.0
+        } : null;
+      }
       console.log(r, g, b);
     }
 
-    renderer.render(camera, lambert, [
+
+    renderer.render(camera, shader, [
       icosphere,
       cube,
       //square,
-    ], r, g , b);
+    ], r, g , b, t);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
