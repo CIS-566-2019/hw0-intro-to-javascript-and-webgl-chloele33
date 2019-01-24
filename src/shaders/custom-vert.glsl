@@ -28,10 +28,10 @@ void main()
 
     vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below
 
-    //modelposition += vec4(sin(u_Time * 3.14/5.0f),
-    //                      cos(u_Time * 3.14/5.0f),
-    //                     tan(u_Time * 3.14/5.0f),
-    //                     0);
+    modelposition += vec4(sin(u_Time * 3.14/100.0f),
+                          cos(u_Time * 3.14/100.0f),
+                         sin(u_Time * 3.14/100.0f),
+                         0);
 
 
     fs_Pos = u_ViewProj * modelposition;
