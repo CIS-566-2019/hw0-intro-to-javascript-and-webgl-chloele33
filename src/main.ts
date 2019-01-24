@@ -25,6 +25,8 @@ let prevTesselations: number = 5;
 let prevColor = [255, 0, 0, 1];
 let prevShader = 'Lambert';
 
+
+
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
   icosphere.create();
@@ -75,17 +77,19 @@ function main() {
   ]);
 
   const custom = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
+    new Shader(gl.VERTEX_SHADER, require('./shaders/custom-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/custom-frag.glsl')),
   ]);
 
   let r = 1;
   let g = 0;
   let b = 0;
+  let t = 0.0;
   let shader = lambert;
 
   // This function will be called every frame
   function tick() {
+    t = t + 1.0;
     camera.update();
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
@@ -132,7 +136,7 @@ function main() {
       icosphere,
       cube,
       //square,
-    ], r, g , b);
+    ], r, g , b, t);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
